@@ -1,23 +1,39 @@
-# داشبورد مالی شخصی
+# Daftar — Personal Finance Dashboard
 
-مدیریت درآمد، هزینه و بودجه ماهانه با تقویم شمسی، اعداد فارسی و حالت تیره.
+[فارسی](README.fa.md)
 
-**استک:** Next.js 14 (App Router) · TypeScript · Tailwind · Recharts · FastAPI · SQLAlchemy · JWT · SQLite / PostgreSQL
+A personal finance ledger built for Persian users: income, expenses and monthly budgets with the Jalali (Shamsi) calendar, Persian digits, RTL layout and light/dark themes.
 
-## قابلیت‌ها
+**Stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · Recharts · FastAPI · SQLAlchemy 2 · JWT · SQLite / PostgreSQL
 
-- ثبت‌نام و ورود با JWT، دسته‌بندی‌های پیش‌فرض برای هر کاربر جدید
-- ثبت، ویرایش و حذف تراکنش با فیلتر نوع، دسته و جستجو در توضیحات
-- بودجه ماهانه برای هر دسته هزینه، با نوار پیشرفت و هشدار از ۸۰٪
-- تراکنش تکرارشونده (اجاره، قسط و ...) که هر ماه در روز مشخص خودکار ثبت می‌شود
-- نمودار سهم دسته‌ها، روند ۶ ماه اخیر و هزینه روزانه
-- تقویم شمسی کامل (انتخاب تاریخ، گروه‌بندی ماهانه، سال کبیسه)
-- خروجی CSV برای Excel و چاپ / PDF
-- حالت تیره، راست‌چین، فونت وزیرمتن
+## Features
 
-## اجرا
+- Public landing page with an animated ledger preview, features, how-it-works steps and FAQ
+- Animated login and sign-up pages with password strength meter and show/hide password
+- JWT authentication; every new user gets a default set of categories
+- Create, edit and delete transactions, filtered by type, category and note search
+- Monthly budget per expense category with a progress bar and warnings from 80%
+- Recurring transactions (rent, instalments, ...) generated automatically on a chosen day each month
+- Charts: spending share by category, six-month trend, daily spending
+- Full Jalali calendar support (date picker, monthly grouping, leap years)
+- CSV export for Excel, print / save as PDF
+- Monochrome black-and-white design with dark and light themes, RTL, Vazirmatn font
 
-### بک‌اند
+## Routes
+
+| Path                  | Page                         |
+| --------------------- | ---------------------------- |
+| `/`                   | Landing page                 |
+| `/login`, `/register` | Authentication               |
+| `/dashboard`          | Monthly overview and charts  |
+| `/transactions`       | Transactions list and editor |
+| `/budgets`            | Monthly budgets              |
+| `/recurring`          | Recurring transactions       |
+| `/categories`         | Categories                   |
+
+## Getting started
+
+### Backend
 
 ```bash
 cd backend
@@ -28,11 +44,15 @@ cp .env.example .env
 uvicorn app.main:app --reload --port 8000
 ```
 
-مستندات API: http://localhost:8000/docs
+On Windows PowerShell activate the environment with `.venv\Scripts\Activate.ps1`.
 
-برای PostgreSQL در `DATABASE_URL` مقدار مثل `postgresql://user:pass@localhost:5432/finance` بگذارید.
+API docs: http://localhost:8000/docs
 
-### فرانت‌اند
+The backend does not load `.env` automatically. Export the variables in your shell, or start uvicorn with `--env-file .env`.
+
+For PostgreSQL set `DATABASE_URL` to something like `postgresql://user:pass@localhost:5432/finance`.
+
+### Frontend
 
 ```bash
 cd frontend
@@ -41,26 +61,43 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-آدرس: http://localhost:3000
+App: http://localhost:3000
 
-## متغیرهای محیطی
+If styles or layout look stale after pulling changes, clear the cache and restart:
 
-| متغیر | کجا | توضیح |
-| --- | --- | --- |
-| `SECRET_KEY` | بک‌اند | کلید امضای JWT، حتماً در محیط واقعی عوض شود |
-| `DATABASE_URL` | بک‌اند | پیش‌فرض SQLite محلی |
-| `FRONTEND_ORIGIN` | بک‌اند | آدرس مجاز برای CORS، چند آدرس با ویرگول |
-| `TOKEN_EXPIRE_MINUTES` | بک‌اند | پیش‌فرض ۷ روز |
-| `NEXT_PUBLIC_API_URL` | فرانت‌اند | آدرس بک‌اند |
+```powershell
+Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue
+npm run dev
+```
 
-## ساختار
+## Environment variables
+
+| Variable               | Where    | Description                                           |
+| ---------------------- | -------- | ----------------------------------------------------- |
+| `SECRET_KEY`           | backend  | JWT signing key. Change it in any real deployment     |
+| `DATABASE_URL`         | backend  | Defaults to a local SQLite file                       |
+| `FRONTEND_ORIGIN`      | backend  | Allowed CORS origin(s), comma-separated               |
+| `TOKEN_EXPIRE_MINUTES` | backend  | Defaults to 7 days                                    |
+| `NEXT_PUBLIC_API_URL`  | frontend | Backend base URL, defaults to `http://localhost:8000` |
+
+## Project structure
 
 ```
 backend/app
   main.py  models.py  schemas.py  auth.py  services.py  jalali.py  database.py
   routers/  auth  categories  transactions  budgets  recurring  reports
 frontend
-  app/(app)/  داشبورد، تراکنش‌ها، بودجه، تکرارشونده‌ها، دسته‌ها
-  app/login/
-  components/  lib/
+  app/page.tsx          landing page
+  app/login, register   authentication pages
+  app/(app)/            dashboard, transactions, budgets, recurring, categories
+  components/           AuthScreen, LedgerPreview, LandingNav, Modal, ...
+  lib/                  api client, Jalali helpers, formatting, types
 ```
+
+## Design notes
+
+- Amounts are stored as integers (Toman) to avoid floating-point errors in totals.
+- The Jalali conversion is implemented independently in Python (`jalali.py`) and TypeScript (`lib/jalali.ts`), so month boundaries match on both sides.
+- Direction is set explicitly with `dir="rtl"` on the page roots, email and password inputs stay LTR, and signed numbers use the `.num` class so minus and plus signs never flip.
+- The page always reserves scrollbar space (`overflow-y: scroll` on `html`) so the header does not shift between short and long pages.
+- Animations respect `prefers-reduced-motion`.

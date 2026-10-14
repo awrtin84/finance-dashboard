@@ -1,107 +1,3 @@
-# Daftar — Personal Finance Dashboard
-
-[فارسی](README.fa.md)
-
-A personal finance ledger built for Persian users: income, expenses and monthly budgets with the Jalali (Shamsi) calendar, Persian digits, RTL layout and light/dark themes.
-
-**Stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · Recharts · FastAPI · SQLAlchemy 2 · JWT · SQLite / PostgreSQL
-
-## Features
-
-- Public landing page with an animated ledger preview, features, how-it-works steps and FAQ
-- Animated login and sign-up pages with password strength meter and show/hide password
-- JWT authentication; every new user gets a default set of categories
-- Create, edit and delete transactions, filtered by type, category and note search
-- Monthly budget per expense category with a progress bar and warnings from 80%
-- Recurring transactions (rent, instalments, ...) generated automatically on a chosen day each month
-- Charts: spending share by category, six-month trend, daily spending
-- Full Jalali calendar support (date picker, monthly grouping, leap years)
-- CSV export for Excel, print / save as PDF
-- Monochrome black-and-white design with dark and light themes, RTL, Vazirmatn font
-
-## Routes
-
-| Path                  | Page                         |
-| --------------------- | ---------------------------- |
-| `/`                   | Landing page                 |
-| `/login`, `/register` | Authentication               |
-| `/dashboard`          | Monthly overview and charts  |
-| `/transactions`       | Transactions list and editor |
-| `/budgets`            | Monthly budgets              |
-| `/recurring`          | Recurring transactions       |
-| `/categories`         | Categories                   |
-
-## Getting started
-
-### Backend
-
-```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-uvicorn app.main:app --reload --port 8000
-```
-
-On Windows PowerShell activate the environment with `.venv\Scripts\Activate.ps1`.
-
-API docs: http://localhost:8000/docs
-
-The backend does not load `.env` automatically. Export the variables in your shell, or start uvicorn with `--env-file .env`.
-
-For PostgreSQL set `DATABASE_URL` to something like `postgresql://user:pass@localhost:5432/finance`.
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-cp .env.local.example .env.local
-npm run dev
-```
-
-App: http://localhost:3000
-
-If styles or layout look stale after pulling changes, clear the cache and restart:
-
-```powershell
-Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue
-npm run dev
-```
-
-## Environment variables
-
-| Variable               | Where    | Description                                           |
-| ---------------------- | -------- | ----------------------------------------------------- |
-| `SECRET_KEY`           | backend  | JWT signing key. Change it in any real deployment     |
-| `DATABASE_URL`         | backend  | Defaults to a local SQLite file                       |
-| `FRONTEND_ORIGIN`      | backend  | Allowed CORS origin(s), comma-separated               |
-| `TOKEN_EXPIRE_MINUTES` | backend  | Defaults to 7 days                                    |
-| `NEXT_PUBLIC_API_URL`  | frontend | Backend base URL, defaults to `http://localhost:8000` |
-
-## Project structure
-
-```
-backend/app
-  main.py  models.py  schemas.py  auth.py  services.py  jalali.py  database.py
-  routers/  auth  categories  transactions  budgets  recurring  reports
-frontend
-  app/page.tsx          landing page
-  app/login, register   authentication pages
-  app/(app)/            dashboard, transactions, budgets, recurring, categories
-  components/           AuthScreen, LedgerPreview, LandingNav, Modal, ...
-  lib/                  api client, Jalali helpers, formatting, types
-```
-
-## Design notes
-
-- Amounts are stored as integers (Toman) to avoid floating-point errors in totals.
-- The Jalali conversion is implemented independently in Python (`jalali.py`) and TypeScript (`lib/jalali.ts`), so month boundaries match on both sides.
-- Direction is set explicitly with `dir="rtl"` on the page roots, email and password inputs stay LTR, and signed numbers use the `.num` class so minus and plus signs never flip.
-- The page always reserves scrollbar space (`overflow-y: scroll` on `html`) so the header does not shift between short and long pages.
-- Animations respect `prefers-reduced-motion`.
-
 # Daftar (دفتر) — Personal Finance Dashboard
 
 [فارسی](README.fa.md)
@@ -235,21 +131,24 @@ Change the account with the `DEMO_EMAIL`, `DEMO_PASSWORD` and `DEMO_NAME` variab
 
 ## Deploying the demo on Cloudflare
 
-The demo needs no backend or database, so the frontend alone is enough. The Next.js app is deployed to Cloudflare Workers with the OpenNext adapter:
+The demo needs no backend or database. With `NEXT_PUBLIC_DEMO=1`, `next build` exports the whole app as static files into `frontend/out`, and Cloudflare Workers serves them as static assets (configured in `frontend/wrangler.jsonc`).
 
-```bash
-cd frontend
-npm install @opennextjs/cloudflare@latest
-npm install -D wrangler@latest
-npx opennextjs-cloudflare build
-npx opennextjs-cloudflare deploy
-```
+Deploy straight from GitHub with Workers Builds:
 
-You need a `wrangler.jsonc` and an `open-next.config.ts`, which `npm create cloudflare@latest -- --framework=next` generates. Cloudflare's setup may change between versions, so follow its current documentation if a step fails.
+1. Push the repository to GitHub.
+2. In the Cloudflare dashboard open **Workers & Pages**, then **Create application**, then **Import a repository**, and pick the repository.
+3. Use these settings:
+    - Project / Worker name: `finance-dashboard` (it must match `name` in `wrangler.jsonc`)
+    - Root directory: `frontend`
+    - Build command: `npm install && npm run build`
+    - Deploy command: `npx wrangler deploy`
+4. Save and deploy. The app is then served at `https://finance-dashboard.<your-subdomain>.workers.dev`. Every push to the main branch redeploys it.
 
-Because `.env.production` is committed, the production build is made in demo mode automatically. Afterwards, replace `YOUR-APP.workers.dev` at the top of this file with the real address.
+To deploy from your own computer instead, run `npm run build` and `npx wrangler deploy` inside `frontend`.
 
-To deploy the full version instead, host the FastAPI backend on a service that runs Python (for example Render) with a PostgreSQL database, remove `NEXT_PUBLIC_DEMO` and set `NEXT_PUBLIC_API_URL` to the backend address before building.
+The OpenNext adapter is not used, because the demo is fully static and the latest adapter versions require a newer Next.js than the 14.x used here. Replace `YOUR-APP.workers.dev` at the top of this file with the real address.
+
+To deploy the full version instead, host the FastAPI backend on a service that runs Python (for example Render) with a PostgreSQL database, remove `NEXT_PUBLIC_DEMO` and set `NEXT_PUBLIC_API_URL` to the backend address before building. Without demo mode the app is not exported statically, so it needs a Node-capable host.
 
 ## Environment variables
 
@@ -273,6 +172,8 @@ backend
     main.py  models.py  schemas.py  auth.py  services.py  jalali.py  database.py
     routers/            auth  categories  transactions  budgets  recurring  reports
 frontend
+  wrangler.jsonc        Cloudflare Workers static-assets config
+  next.config.mjs       enables static export in demo mode
   app/page.tsx          landing page
   app/login, register   authentication pages
   app/(app)/            dashboard, transactions, budgets, recurring, categories

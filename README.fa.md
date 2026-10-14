@@ -131,21 +131,24 @@ python seed_demo.py
 
 ## دیپلوی نسخه‌ی نمایشی روی Cloudflare
 
-نسخه‌ی نمایشی بک‌اند و دیتابیس لازم ندارد، پس فقط فرانت‌اند کافی است. برنامه‌ی Next.js با آداپتر OpenNext روی Cloudflare Workers اجرا می‌شود:
+نسخه‌ی نمایشی بک‌اند و دیتابیس لازم ندارد. وقتی `NEXT_PUBLIC_DEMO=1` باشد، `next build` کل برنامه را به‌صورت فایل‌های ثابت در `frontend/out` خروجی می‌گیرد و Cloudflare Workers آن‌ها را به‌عنوان static assets سرو می‌کند (تنظیمش در `frontend/wrangler.jsonc` است).
 
-```bash
-cd frontend
-npm install @opennextjs/cloudflare@latest
-npm install -D wrangler@latest
-npx opennextjs-cloudflare build
-npx opennextjs-cloudflare deploy
-```
+دیپلوی مستقیم از GitHub با Workers Builds:
 
-یک فایل `wrangler.jsonc` و یک فایل `open-next.config.ts` لازم است که دستور `npm create cloudflare@latest -- --framework=next` آن‌ها را می‌سازد. مراحل Cloudflare ممکن است بین نسخه‌ها عوض شود. اگر مرحله‌ای خطا داد، مستندات فعلی‌اش را دنبال کن.
+1. ریپو را روی GitHub بگذار.
+2. در داشبورد Cloudflare به **Workers & Pages** برو، **Create application** و بعد **Import a repository** را بزن و ریپو را انتخاب کن.
+3. این تنظیمات را بگذار:
+    - نام پروژه / Worker: `finance-dashboard` (باید با `name` در `wrangler.jsonc` یکی باشد)
+    - Root directory: `frontend`
+    - Build command: `npm install && npm run build`
+    - Deploy command: `npx wrangler deploy`
+4. ذخیره و دیپلوی کن. برنامه روی `https://finance-dashboard.<your-subdomain>.workers.dev` بالا می‌آید. با هر push به شاخه‌ی اصلی دوباره دیپلوی می‌شود.
 
-چون `.env.production` در گیت هست، بیلد production خودکار در حالت نمایشی ساخته می‌شود. بعد از دیپلوی، `YOUR-APP.workers.dev` را در بالای این فایل با آدرس واقعی عوض کن.
+برای دیپلوی از کامپیوتر خودت، داخل `frontend` دستورهای `npm run build` و `npx wrangler deploy` را بزن.
 
-برای دیپلوی نسخه‌ی کامل، بک‌اند FastAPI را روی سرویسی که پایتون اجرا می‌کند (مثلاً Render) با یک دیتابیس PostgreSQL بالا بیاور، `NEXT_PUBLIC_DEMO` را حذف کن و قبل از بیلد `NEXT_PUBLIC_API_URL` را روی آدرس بک‌اند بگذار.
+آداپتر OpenNext استفاده نشده، چون نسخه‌ی نمایشی کاملاً ثابت است و آخرین نسخه‌های آداپتر Next.js جدیدتری از ۱۴ این پروژه می‌خواهند. بعد از دیپلوی، `YOUR-APP.workers.dev` را در بالای این فایل با آدرس واقعی عوض کن.
+
+برای دیپلوی نسخه‌ی کامل، بک‌اند FastAPI را روی سرویسی که پایتون اجرا می‌کند (مثلاً Render) با یک دیتابیس PostgreSQL بالا بیاور، `NEXT_PUBLIC_DEMO` را حذف کن و قبل از بیلد `NEXT_PUBLIC_API_URL` را روی آدرس بک‌اند بگذار. بدون حالت نمایشی برنامه به‌صورت ثابت خروجی گرفته نمی‌شود و به هاستی نیاز دارد که Node را اجرا کند.
 
 ## متغیرهای محیطی
 
@@ -169,6 +172,8 @@ backend
     main.py  models.py  schemas.py  auth.py  services.py  jalali.py  database.py
     routers/            auth  categories  transactions  budgets  recurring  reports
 frontend
+  wrangler.jsonc        تنظیم static assets در Cloudflare Workers
+  next.config.mjs       فعال‌کردن خروجی ثابت در حالت نمایشی
   app/page.tsx          صفحه معرفی
   app/login, register   صفحه‌های ورود و ثبت‌نام
   app/(app)/            داشبورد، تراکنش‌ها، بودجه، تکرارشونده‌ها، دسته‌ها

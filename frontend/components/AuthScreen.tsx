@@ -7,6 +7,7 @@ import LedgerPreview from "@/components/LedgerPreview";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import { ApiError, api, setToken } from "@/lib/api";
+import { DEMO_MODE, enterDemo } from "@/lib/demo";
 
 type Mode = "login" | "register";
 type Status = "idle" | "loading" | "success";
@@ -74,6 +75,11 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
 
     const score = isRegister ? passwordScore(password) : 0;
     const emailValid = EMAIL_PATTERN.test(email);
+
+    const openDemo = () => {
+        enterDemo();
+        router.replace("/dashboard");
+    };
 
     const submit = async (event: FormEvent) => {
         event.preventDefault();
@@ -356,6 +362,26 @@ export default function AuthScreen({ mode }: { mode: Mode }) {
                             </button>
                         </div>
                     </form>
+
+                    {DEMO_MODE && (
+                        <div
+                            className="mt-6 animate-rise rounded-xl border border-dashed border-slate-300 p-4 dark:border-slate-700"
+                            style={stagger(isRegister ? 5 : 4)}
+                        >
+                            <p className="text-sm leading-7 text-slate-600 dark:text-slate-400">
+                                این نسخه‌ی نمایشی است و به سرور وصل نیست. هر
+                                ایمیل و رمزی کار می‌کند و داده‌ها فقط در مرورگر
+                                خودت می‌مانند.
+                            </p>
+                            <button
+                                type="button"
+                                onClick={openDemo}
+                                className="btn-ghost mt-3 w-full"
+                            >
+                                ورود با حساب آزمایشی
+                            </button>
+                        </div>
+                    )}
 
                     <p
                         className="mt-6 animate-rise text-sm text-slate-600 dark:text-slate-400"

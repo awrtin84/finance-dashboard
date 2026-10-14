@@ -119,7 +119,7 @@ export default function LandingPage() {
                         className="grid-paper absolute inset-0 -z-10"
                         aria-hidden="true"
                     />
-                    <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 pb-24 pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24">
+                    <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 px-5 pb-24 pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24">
                         <div>
                             <h1 className="text-balance text-[clamp(2.6rem,6vw,4.75rem)] font-black leading-[1.35]">
                                 پولت کجا رفت؟

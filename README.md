@@ -63,8 +63,10 @@ Requirements: Node.js 18+ for the frontend, Python 3.10+ for the backend (full m
 cd frontend
 npm install
 npm run build
-npm run start
+npx serve@latest out
 ```
+
+The build exports static files into `frontend/out`, so `npm run start` does not work in demo mode. `npx serve@latest out` serves them locally (it prints the address, usually http://localhost:3000).
 
 The demo flag is read from `frontend/.env.production`, which contains:
 

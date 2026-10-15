@@ -14,6 +14,7 @@ import {
     YAxis,
 } from "recharts";
 import MonthPicker from "@/components/MonthPicker";
+import Skeleton from "@/components/Skeleton";
 import StatCard from "@/components/StatCard";
 import { api } from "@/lib/api";
 import { compact, money, toFa } from "@/lib/format";
@@ -76,7 +77,25 @@ export default function DashboardPage() {
 
             {error && <p className="text-sm text-red-600">{error}</p>}
             {!summary && !error && (
-                <p className="text-slate-500">در حال بارگذاری...</p>
+                <div
+                    className="space-y-4"
+                    role="status"
+                    aria-label="در حال بارگذاری"
+                >
+                    <div className="grid gap-4 sm:grid-cols-3">
+                        {[0, 1, 2].map((i) => (
+                            <Skeleton
+                                key={i}
+                                className="h-[104px] rounded-2xl"
+                            />
+                        ))}
+                    </div>
+                    <div className="grid gap-4 lg:grid-cols-2">
+                        <Skeleton className="h-72 rounded-2xl" />
+                        <Skeleton className="h-72 rounded-2xl" />
+                    </div>
+                    <Skeleton className="h-96 rounded-2xl" />
+                </div>
             )}
 
             {summary && (
@@ -84,17 +103,17 @@ export default function DashboardPage() {
                     <div className="grid gap-4 sm:grid-cols-3">
                         <StatCard
                             title="درآمد ماه"
-                            value={`${money(summary.income)} تومان`}
+                            amount={summary.income}
                             tone="green"
                         />
                         <StatCard
                             title="هزینه ماه"
-                            value={`${money(summary.expense)} تومان`}
+                            amount={summary.expense}
                             tone="red"
                         />
                         <StatCard
                             title="مانده"
-                            value={`${money(summary.balance)} تومان`}
+                            amount={summary.balance}
                             tone="indigo"
                             hint={
                                 summary.balance < 0
@@ -219,7 +238,7 @@ export default function DashboardPage() {
                                                 </div>
                                                 <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                                                     <div
-                                                        className={`h-full ${ratio >= 1 ? "bg-red-500" : "bg-amber-500"}`}
+                                                        className={`h-full origin-right animate-fill transition-[width] duration-700 ${ratio >= 1 ? "bg-red-500" : "bg-amber-500"}`}
                                                         style={{
                                                             width: `${Math.min(ratio, 1) * 100}%`,
                                                         }}

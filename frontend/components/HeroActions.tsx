@@ -19,11 +19,11 @@ export default function HeroActions({
     }, []);
 
     const primary = inverted
-        ? "btn h-12 bg-white px-7 text-base text-black hover:bg-slate-200 dark:bg-black dark:text-white dark:hover:bg-slate-800"
-        : "btn-primary h-12 px-7 text-base";
+        ? "btn h-12 grow bg-white px-7 text-base sm:grow-0 text-black hover:bg-slate-200 dark:bg-black dark:text-white dark:hover:bg-slate-800"
+        : "btn-primary h-12 grow px-7 text-base sm:grow-0";
     const secondary = inverted
-        ? "btn h-12 border border-white/30 px-7 text-base text-white hover:bg-white/10 dark:border-black/30 dark:text-black dark:hover:bg-black/10"
-        : "btn-ghost h-12 px-7 text-base";
+        ? "btn h-12 grow border border-white/30 px-7 text-base sm:grow-0 text-white hover:bg-white/10 dark:border-black/30 dark:text-black dark:hover:bg-black/10"
+        : "btn-ghost h-12 grow px-7 text-base sm:grow-0";
 
     return (
         <div className="flex flex-wrap items-center gap-3">

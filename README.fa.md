@@ -63,8 +63,10 @@
 cd frontend
 npm install
 npm run build
-npm run start
+npx serve@latest out
 ```
+
+بیلد فایل‌های ثابت را در `frontend/out` خروجی می‌گیرد، پس در حالت نمایشی `npm run start` کار نمی‌کند. دستور `npx serve@latest out` آن‌ها را محلی سرو می‌کند (آدرس را چاپ می‌کند، معمولاً http://localhost:3000).
 
 پرچم دمو از فایل `frontend/.env.production` خوانده می‌شود که محتوایش این است:
 

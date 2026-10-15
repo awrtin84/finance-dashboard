@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Modal from "@/components/Modal";
 import MonthPicker from "@/components/MonthPicker";
+import Skeleton from "@/components/Skeleton";
 import TransactionForm from "@/components/TransactionForm";
 import { api, downloadFile } from "@/lib/api";
 import { money, toFa } from "@/lib/format";
@@ -196,16 +197,14 @@ export default function TransactionsPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {!data && (
-                            <tr>
-                                <td
-                                    colSpan={5}
-                                    className="p-8 text-center text-slate-500"
-                                >
-                                    در حال بارگذاری...
-                                </td>
-                            </tr>
-                        )}
+                        {!data &&
+                            [0, 1, 2, 3, 4, 5].map((i) => (
+                                <tr key={i}>
+                                    <td colSpan={5} className="p-3">
+                                        <Skeleton className="h-7" />
+                                    </td>
+                                </tr>
+                            ))}
                         {data && data.items.length === 0 && (
                             <tr>
                                 <td

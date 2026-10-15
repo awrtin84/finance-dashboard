@@ -1,18 +1,64 @@
 "use client";
 
+import type { MouseEvent } from "react";
+
+type TransitionDocument = Document & {
+    startViewTransition?: (update: () => void) => { ready: Promise<void> };
+};
+
 export default function ThemeToggle({
     className = "",
 }: {
     className?: string;
 }) {
-    const toggle = () => {
+    const toggle = async (event: MouseEvent<HTMLButtonElement>) => {
         const root = document.documentElement;
-        root.classList.add("theme-anim");
-        const dark = root.classList.toggle("dark");
+        const doc = document as TransitionDocument;
+
+        const apply = () => {
+            const dark = root.classList.toggle("dark");
+            try {
+                localStorage.setItem("fd_theme", dark ? "dark" : "light");
+            } catch {}
+        };
+
+        const reduced = window.matchMedia(
+            "(prefers-reduced-motion: reduce)",
+        ).matches;
+        if (!doc.startViewTransition || reduced) {
+            root.classList.add("theme-anim");
+            apply();
+            window.setTimeout(() => root.classList.remove("theme-anim"), 400);
+            return;
+        }
+
+        const rect = event.currentTarget.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        const radius = Math.hypot(
+            Math.max(x, window.innerWidth - x),
+            Math.max(y, window.innerHeight - y),
+        );
+
+        const transition = doc.startViewTransition(apply);
         try {
-            localStorage.setItem("fd_theme", dark ? "dark" : "light");
-        } catch {}
-        window.setTimeout(() => root.classList.remove("theme-anim"), 400);
+            await transition.ready;
+        } catch {
+            return;
+        }
+        root.animate(
+            {
+                clipPath: [
+                    `circle(0px at ${x}px ${y}px)`,
+                    `circle(${radius}px at ${x}px ${y}px)`,
+                ],
+            },
+            {
+                duration: 750,
+                easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                pseudoElement: "::view-transition-new(root)",
+            },
+        );
     };
 
     return (
@@ -20,7 +66,7 @@ export default function ThemeToggle({
             type="button"
             onClick={toggle}
             aria-label="تغییر بین تم روشن و تیره"
-            className={`relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-slate-300 text-slate-900 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800 ${className}`}
+            className={`relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-slate-300 text-slate-900 transition duration-200 hover:bg-slate-100 active:scale-90 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800 ${className}`}
         >
             <svg
                 viewBox="0 0 24 24"

@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
     themeColor: "#0a0a0a",
+    viewportFit: "cover",
 };
 
 const themeScript = `try{if(localStorage.getItem("fd_theme")!=="light"){document.documentElement.classList.add("dark")}}catch(e){document.documentElement.classList.add("dark")}`;

@@ -1,6 +1,9 @@
+import CountUp from "@/components/Countup";
+import { money } from "@/lib/format";
+
 interface Props {
     title: string;
-    value: string;
+    amount: number;
     tone: "green" | "red" | "indigo";
     hint?: string;
 }
@@ -11,13 +14,15 @@ const tones = {
     indigo: "text-indigo-600 dark:text-indigo-400",
 };
 
-export default function StatCard({ title, value, tone, hint }: Props) {
+export default function StatCard({ title, amount, tone, hint }: Props) {
     return (
         <div className="card p-5">
             <p className="text-sm text-slate-500 dark:text-slate-400">
                 {title}
             </p>
-            <p className={`mt-2 text-2xl font-bold ${tones[tone]}`}>{value}</p>
+            <p className={`mt-2 text-2xl font-bold ${tones[tone]}`}>
+                <CountUp value={amount} format={money} /> تومان
+            </p>
             {hint && (
                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                     {hint}

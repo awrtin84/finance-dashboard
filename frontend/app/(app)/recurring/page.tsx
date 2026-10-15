@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import Skeleton from "@/components/Skeleton";
 import { api } from "@/lib/api";
 import { money, parseAmount, toFa } from "@/lib/format";
 import type { Category, RecurringRule, TxType } from "@/lib/types";
@@ -189,16 +190,14 @@ export default function RecurringPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {!rules && (
-                            <tr>
-                                <td
-                                    colSpan={6}
-                                    className="p-8 text-center text-slate-500"
-                                >
-                                    در حال بارگذاری...
-                                </td>
-                            </tr>
-                        )}
+                        {!rules &&
+                            [0, 1, 2].map((i) => (
+                                <tr key={i}>
+                                    <td colSpan={6} className="p-3">
+                                        <Skeleton className="h-7" />
+                                    </td>
+                                </tr>
+                            ))}
                         {rules && rules.length === 0 && (
                             <tr>
                                 <td

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import MonthPicker from "@/components/MonthPicker";
+import Skeleton from "@/components/Skeleton";
 import { api } from "@/lib/api";
 import { money, parseAmount, toFa } from "@/lib/format";
 import { todayJalali } from "@/lib/jalali";
@@ -78,7 +79,19 @@ export default function BudgetsPage() {
 
             {error && <p className="text-sm text-red-600">{error}</p>}
             {!rows && !error && (
-                <p className="text-slate-500">در حال بارگذاری...</p>
+                <div
+                    className="space-y-3"
+                    role="status"
+                    aria-label="در حال بارگذاری"
+                >
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Skeleton className="h-[88px] rounded-2xl" />
+                        <Skeleton className="h-[88px] rounded-2xl" />
+                    </div>
+                    {[0, 1, 2, 3, 4].map((i) => (
+                        <Skeleton key={i} className="h-[84px] rounded-2xl" />
+                    ))}
+                </div>
             )}
 
             {rows && (
@@ -170,7 +183,7 @@ export default function BudgetsPage() {
                                         <div className="mt-3">
                                             <div className="h-2.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                                                 <div
-                                                    className={`h-full ${barColor}`}
+                                                    className={`h-full origin-right animate-fill transition-[width] duration-700 ${barColor}`}
                                                     style={{
                                                         width: `${Math.min(ratio, 1) * 100}%`,
                                                     }}

@@ -5,6 +5,7 @@ import InView from "@/components/InView";
 import LandingNav from "@/components/LandingNav";
 import LedgerPreview from "@/components/LedgerPreview";
 import Logo from "@/components/Logo";
+import Tilt from "@/components/Tilt";
 import { toFa } from "@/lib/format";
 
 export const metadata: Metadata = {
@@ -36,7 +37,10 @@ const features = [
         text: "برای هر دسته یک سقف ماهانه بذار. از ۸۰٪ نوار نارنجی می‌شه و داشبورد هشدار می‌ده، بالای ۱۰۰٪ قرمز.",
         demo: (
             <span className="block h-2 w-40 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-                <span className="block h-full w-[82%] rounded-full bg-slate-900 dark:bg-white" />
+                <span
+                    className="block h-full w-[82%] origin-right scale-x-0 rounded-full bg-slate-900 transition-transform duration-1000 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-data-[seen=true]/seen:scale-x-100 dark:bg-white"
+                    style={{ transitionDelay: "250ms" }}
+                />
             </span>
         ),
     },
@@ -53,8 +57,12 @@ const features = [
                 {[40, 60, 45, 75, 55, 90].map((h, i) => (
                     <span
                         key={i}
-                        className="w-2 rounded-sm bg-slate-900 dark:bg-white"
-                        style={{ height: `${h}%`, opacity: 0.25 + i * 0.15 }}
+                        className="w-2 origin-bottom scale-y-0 rounded-sm bg-slate-900 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-data-[seen=true]/seen:scale-y-100 dark:bg-white"
+                        style={{
+                            height: `${h}%`,
+                            opacity: 0.25 + i * 0.15,
+                            transitionDelay: `${250 + i * 90}ms`,
+                        }}
                     />
                 ))}
             </span>
@@ -122,26 +130,42 @@ export default function LandingPage() {
                     <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 px-5 pb-24 pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24">
                         <div>
                             <h1 className="text-balance text-[clamp(2.6rem,6vw,4.75rem)] font-black leading-[1.35]">
-                                پولت کجا رفت؟
-                                <span className="block font-light text-slate-500 dark:text-slate-400">
+                                <span className="block animate-rise">
+                                    پولت کجا رفت؟
+                                </span>
+                                <span
+                                    className="block animate-rise font-light text-slate-500 dark:text-slate-400"
+                                    style={{ animationDelay: "160ms" }}
+                                >
                                     دفتر جواب می‌ده.
                                 </span>
                             </h1>
-                            <p className="mt-7 max-w-xl text-lg leading-9 text-slate-600 dark:text-slate-300">
+                            <p
+                                className="mt-7 max-w-xl animate-rise text-lg leading-9 text-slate-600 dark:text-slate-300"
+                                style={{ animationDelay: "320ms" }}
+                            >
                                 دفتر درآمد و هزینه‌هات رو با تقویم شمسی ردیف
                                 می‌کنه، سقف هر دسته رو زیر نظر داره و آخر ماه
                                 نشونت می‌ده پول کجا خرج شده.
                             </p>
-                            <div className="mt-9">
+                            <div
+                                className="mt-9 animate-rise"
+                                style={{ animationDelay: "460ms" }}
+                            >
                                 <HeroActions />
                             </div>
-                            <p className="mt-5 text-sm text-slate-500 dark:text-slate-400">
+                            <p
+                                className="mt-5 animate-rise text-sm text-slate-500 dark:text-slate-400"
+                                style={{ animationDelay: "580ms" }}
+                            >
                                 بدون نصب. یک ایمیل و یک رمز عبور کافیه.
                             </p>
                         </div>
 
                         <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-                            <LedgerPreview className="lg:rotate-1" />
+                            <Tilt>
+                                <LedgerPreview />
+                            </Tilt>
                         </div>
                     </div>
                 </section>
@@ -157,17 +181,22 @@ export default function LandingPage() {
                         {features.map((feature) => (
                             <li
                                 key={feature.title}
-                                className="grid items-center gap-4 border-t border-slate-200 py-8 last:border-b dark:border-slate-800 md:grid-cols-[13rem_1fr_13rem] md:gap-10"
+                                className="border-t border-slate-200 last:border-b dark:border-slate-800"
                             >
-                                <h3 className="text-xl font-extrabold">
-                                    {feature.title}
-                                </h3>
-                                <p className="max-w-xl leading-8 text-slate-600 dark:text-slate-400">
-                                    {feature.text}
-                                </p>
-                                <div className="flex md:justify-end">
-                                    {feature.demo}
-                                </div>
+                                <InView
+                                    threshold={0.5}
+                                    className="grid items-center gap-4 py-8 md:grid-cols-[13rem_1fr_13rem] md:gap-10"
+                                >
+                                    <h3 className="text-xl font-extrabold">
+                                        {feature.title}
+                                    </h3>
+                                    <p className="max-w-xl leading-8 text-slate-600 dark:text-slate-400">
+                                        {feature.text}
+                                    </p>
+                                    <div className="flex md:justify-end">
+                                        {feature.demo}
+                                    </div>
+                                </InView>
                             </li>
                         ))}
                     </ul>

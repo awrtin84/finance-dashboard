@@ -14,13 +14,27 @@ const anchors = [
 
 export default function LandingNav() {
     const [loggedIn, setLoggedIn] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
         setLoggedIn(Boolean(getToken()));
     }, []);
 
+    useEffect(() => {
+        const update = () => setScrolled(window.scrollY > 8);
+        update();
+        window.addEventListener("scroll", update, { passive: true });
+        return () => window.removeEventListener("scroll", update);
+    }, []);
+
     return (
-        <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/80 backdrop-blur dark:border-slate-800/80 dark:bg-slate-950/80">
+        <header
+            className={`sticky top-0 z-40 border-b transition-[background-color,border-color,backdrop-filter] duration-300 ${
+                scrolled
+                    ? "border-slate-200/80 bg-white/80 backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/80"
+                    : "border-transparent bg-transparent"
+            }`}
+        >
             <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-5">
                 <Link href="/" aria-label="دفتر، صفحه اصلی">
                     <Logo />
